@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Literal
 
+from django.db.models import F
+
 from ninja import Router, Schema
 from ninja.pagination import paginate, LimitOffsetPagination
 
@@ -19,6 +21,8 @@ class EmployeeSchema(Schema):
     amount: int
     hire_date: datetime
 
+    position_title: str | None
+
 
 class EmployeeNotFoundSchema(Schema):
     ok: Literal[False]
@@ -34,7 +38,12 @@ class EmployeeNotFoundSchema(Schema):
 )
 def get_employee(request, id: int):
     try:
-        employee = Employee.objects.get(pk=id)
+        employee = (
+            Employee.objects.select_related("position")
+            .annotate(position_title=F("position__title"))
+            .get(pk=id)
+        )
+
         return 200, EmployeeSchema(
             id=employee.pk,
             first_name=employee.first_name,
@@ -42,6 +51,7 @@ def get_employee(request, id: int):
             middle_name=employee.middle_name,
             amount=employee.amount,
             hire_date=employee.hire_date,
+            position_title=employee.position_title,
         )
     except Employee.DoesNotExist:
         return 410, EmployeeNotFoundSchema(ok=False, error_code="employee_not_found")
@@ -50,4 +60,8 @@ def get_employee(request, id: int):
 @router.get("/", response=List[EmployeeSchema])
 @paginate(LimitOffsetPagination)
 def list_users(request):
-    return Employee.objects.all()
+    return (
+        Employee.objects.select_related("position")
+        .annotate(position_title=F("position__title"))
+        .all()
+    )

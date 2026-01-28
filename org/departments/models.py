@@ -11,6 +11,13 @@ class BaseModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class Position(BaseModel):
+    title = models.CharField(verbose_name="Должность", null=False, blank=False)
+
+    def __str__(self):
+        return f"{self.pk}#{self.title}"
+
+
 class Employee(BaseModel):
     first_name = models.CharField(
         verbose_name="Имя",
@@ -45,4 +52,12 @@ class Employee(BaseModel):
         verbose_name="Дата приёма на работу",
         blank=False,
         null=False,
+    )
+
+    position = models.ForeignKey(
+        Position,
+        on_delete=models.SET_NULL,
+        related_name="employees",
+        null=True,
+        blank=True,
     )

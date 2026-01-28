@@ -20,12 +20,10 @@ from django.urls import path
 
 from ninja import NinjaAPI
 
-
-from departments.api import router as departments_router
+from departments.api import employees_router
 
 api = NinjaAPI()
-api.add_router("/employees", departments_router)
-
+api.add_router("/employees", employees_router)
 
 urlpatterns = [
     path("admin/", admin.site.urls),

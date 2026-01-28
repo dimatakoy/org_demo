@@ -3,13 +3,13 @@ from datetime import datetime
 import pytest
 
 from ninja.testing import TestClient
-from .api import router
+from .api import employees_router
 from .models import Employee
 
 # mock real database
 pytestmark = [pytest.mark.django_db]
 
-client = TestClient(router)
+client = TestClient(employees_router)
 
 
 @pytest.fixture

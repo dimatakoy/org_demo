@@ -8,7 +8,7 @@ from ninja.pagination import paginate, LimitOffsetPagination
 
 from .models import Employee
 
-router = Router()
+employees_router = Router()
 
 
 class EmployeeSchema(Schema):
@@ -29,7 +29,7 @@ class EmployeeNotFoundSchema(Schema):
     error_code: Literal["employee_not_found"]
 
 
-@router.get(
+@employees_router.get(
     "/{id}",
     response={
         200: EmployeeSchema,
@@ -57,7 +57,7 @@ def get_employee(request, id: int):
         return 410, EmployeeNotFoundSchema(ok=False, error_code="employee_not_found")
 
 
-@router.get("/", response=List[EmployeeSchema])
+@employees_router.get("/", response=List[EmployeeSchema])
 @paginate(LimitOffsetPagination)
 def list_users(request):
     return (

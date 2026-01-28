@@ -1,0 +1,53 @@
+from datetime import datetime
+from typing import List, Literal
+
+from ninja import Router, Schema
+from ninja.pagination import paginate, LimitOffsetPagination
+
+from .models import Employee
+
+router = Router()
+
+
+class EmployeeSchema(Schema):
+    id: int
+
+    first_name: str
+    last_name: str
+    middle_name: str | None
+
+    amount: int
+    hire_date: datetime
+
+
+class EmployeeNotFoundSchema(Schema):
+    ok: Literal[False]
+    error_code: Literal["employee_not_found"]
+
+
+@router.get(
+    "/{id}",
+    response={
+        200: EmployeeSchema,
+        410: EmployeeNotFoundSchema,
+    },
+)
+def get_employee(request, id: int):
+    try:
+        employee = Employee.objects.get(pk=id)
+        return 200, EmployeeSchema(
+            id=employee.pk,
+            first_name=employee.first_name,
+            last_name=employee.last_name,
+            middle_name=employee.middle_name,
+            amount=employee.amount,
+            hire_date=employee.hire_date,
+        )
+    except Employee.DoesNotExist:
+        return 410, EmployeeNotFoundSchema(ok=False, error_code="employee_not_found")
+
+
+@router.get("/", response=List[EmployeeSchema])
+@paginate(LimitOffsetPagination)
+def list_users(request):
+    return Employee.objects.all()

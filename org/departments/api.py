@@ -23,6 +23,7 @@ class EmployeeSchema(Schema):
     hire_date: datetime
 
     position_title: str | None
+    department_id: int | None
 
 
 class EmployeeNotFoundSchema(Schema):

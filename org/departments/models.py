@@ -18,6 +18,18 @@ class Position(BaseModel):
         return f"{self.pk}#{self.title}"
 
 
+class Department(BaseModel):
+    title = models.CharField(
+        verbose_name="Департамент",
+        max_length=100,
+        blank=False,
+        null=False,
+    )
+
+    def __str__(self):
+        return f"{self.pk}#{self.title}"
+
+
 class Employee(BaseModel):
     first_name = models.CharField(
         verbose_name="Имя",
@@ -57,6 +69,14 @@ class Employee(BaseModel):
     position = models.ForeignKey(
         Position,
         on_delete=models.SET_NULL,
+        related_name="employees",
+        null=True,
+        blank=True,
+    )
+
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.PROTECT,  # запрещаем удаление отдела, пока в нём есть сотрудники
         related_name="employees",
         null=True,
         blank=True,

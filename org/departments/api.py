@@ -6,9 +6,10 @@ from django.db.models import F
 from ninja import Router, Schema
 from ninja.pagination import paginate, LimitOffsetPagination
 
-from .models import Employee
+from .models import Employee, Department
 
 employees_router = Router()
+departments_router = Router()
 
 
 class EmployeeSchema(Schema):
@@ -27,6 +28,16 @@ class EmployeeSchema(Schema):
 class EmployeeNotFoundSchema(Schema):
     ok: Literal[False]
     error_code: Literal["employee_not_found"]
+
+
+class DepartmentSchema(Schema):
+    id: int
+    title: str
+
+
+class DepartmentFoundSchema(Schema):
+    ok: Literal[False]
+    error_code: Literal["department_not_found"]
 
 
 @employees_router.get(
@@ -65,3 +76,27 @@ def list_users(request):
         .annotate(position_title=F("position__title"))
         .all()
     )
+
+
+@departments_router.get("/", response=List[DepartmentSchema])
+@paginate(LimitOffsetPagination)
+def list_departments(request):
+    return Department.objects.all()
+
+
+@departments_router.get(
+    "/{id}",
+    response={
+        200: DepartmentSchema,
+        410: DepartmentFoundSchema,
+    },
+)
+def list_departments(request, id: int):
+    try:
+        department = Department.objects.get(pk=id)
+        return 200, DepartmentSchema(
+            id=department.pk,
+            title=department.title,
+        )
+    except Department.DoesNotExist:
+        return 410, DepartmentFoundSchema(ok=False, error_code="department_not_found")

@@ -2,7 +2,8 @@ import pytest
 from decimal import Decimal
 from datetime import date
 from django.core.exceptions import ValidationError
-from .models import Employee
+from django.db import transaction, models
+from .models import Employee, Department
 
 
 # mock real database
@@ -18,6 +19,14 @@ def employee_data():
         "amount": Decimal("50000.00"),
         "hire_date": date(2026, 1, 28),
     }
+
+
+@pytest.fixture
+def department_with_employee(employee_data):
+    with transaction.atomic():
+        department = Department.objects.create(title="Тестовый департамент")
+        Employee.objects.create(**employee_data, department=department)
+        return department
 
 
 def test_create_valid_employee(employee_data):
@@ -103,3 +112,8 @@ def test_decimal_places_validation(employee_data):
         employee.full_clean()
 
     assert "amount" in e.value.message_dict
+
+
+def test_cannot_delete_department_with_employee(department_with_employee):
+    with pytest.raises(models.deletion.ProtectedError):
+        department_with_employee.delete()

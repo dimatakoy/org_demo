@@ -1,0 +1,73 @@
+(compression) {
+	encode {
+		zstd
+		gzip
+
+		match {
+			header Content-Type application/atom+xml*
+			header Content-Type application/javascript*
+			header Content-Type application/json*
+			header Content-Type application/rss+xml*
+			header Content-Type application/xhtml+xml*
+			header Content-Type image/svg+xml*
+			header Content-Type text/*
+		}
+	}
+}
+
+(security) {
+	header {
+		Strict-Transport-Security "max-age=31536000";
+
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "deny"
+
+		Referrer-Policy "strict-origin-when-cross-origin"
+
+		Content-Security-Policy "default-src 'self'"
+
+		Cross-Origin-Embedder-Policy "require-corp"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Resource-Policy "same-origin"
+	}
+}
+
+(noindex) {
+	header {
+		X-Robots-Tag "noindex"
+	}
+}
+
+{
+	acme_ca {$CADDY_TLS_CA}
+}
+
+{$CADDY_HOST} {
+	tls {$CADDY_TLS_EMAIL}
+
+	import compression
+	import security
+	import noindex # TODO: remove in production
+
+	header {
+		X-Frame-Options "SAMEORIGIN"
+
+		Cross-Origin-Resource-Policy "cross-origin"
+		Cross-Origin-Embedder-Policy "credentialless"
+		Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';"
+	}
+
+	@backend {
+		path /api/*
+		path /admin/*
+	}
+
+	handle @backend {
+		reverse_proxy backend:8000
+	}
+
+	handle_path /static/* {
+		root * /srv/static
+		file_server
+	}
+}

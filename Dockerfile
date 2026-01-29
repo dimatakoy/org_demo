@@ -23,15 +23,14 @@ WORKDIR /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --locked --no-install-project --no-dev
+    uv sync --locked --no-install-project
 
 # 2. Copy source code
 COPY . /app
 
 # 3. Install the project (creates the actual venv with source code linked/installed)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --no-dev
-
+    uv sync --locked
 
 # ------------------------------------------------------------------------------------
 # Stage 2: Runtime
@@ -59,7 +58,3 @@ COPY --from=builder --chown=app_user:app_user /app /app
 
 # Switch to non-root user
 USER app_user
-
-# Run production server
-# TODO: logo everything to stdout
-CMD ["gunicorn", "org.conf.wsgi:application", "--bind", "0.0.0.0:8000"]

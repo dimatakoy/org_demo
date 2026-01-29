@@ -1,0 +1,47 @@
+services:
+  backend:
+    restart: always
+    command: ./run_backend.sh
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - backend_static:/app/static:rw
+      - ./data/:/app/data/
+    env_file:
+      - ./.env
+    develop:
+      watch:
+        - path: ./**/*.py
+          target: /app
+          action: sync
+          ignore:
+            - ./.venv
+        # rebuilds entire container if dependency changed
+        - path: ./uv.lock
+          action: rebuild
+
+  caddy:
+    image: caddy:2.10.2-alpine
+    ports:
+      - 443:443
+      - 80:80
+    env_file:
+      - ./.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - backend_static:/srv/static:ro
+    develop:
+      watch:
+        - path: ./Caddyfile
+          action: restart
+
+volumes:
+  caddy_data:
+    name: caddy_data
+  caddy_config:
+    name: caddy_config
+  backend_static:
+    name: backend_static

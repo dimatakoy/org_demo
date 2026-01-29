@@ -60,11 +60,30 @@
 - [x] Добавить seed файл для генерации 50_000 сотрудников и 25 отделов
 - [x] Перенести хранение сессий в базу
 - [x] Добавить Dockerfile для сборки бекенда
-- [ ] Добавить docker compose
+- [x] Добавить docker compose
 - [ ] Переехать на postgresql
 - [ ] Развернуть демку
 - [ ] Написать инструкцию для разворачивания
+- [ ] Убрать установку dev dependencies в prod
 
 ## Как поднять проект
 
-- `python manage.py seed_employees` - Заполнить базу работниками
+```bash
+
+# copy env variables
+cp .env.example .env
+
+# up env
+docker compose up --build
+
+# migrate base
+docker compose run backend ./manage.py migrate
+docker compose run backend ./manage.py seed_employees
+
+# create super user
+docker compose run backend ./manage.py createsuperuser
+
+# if our config the same
+open https://localhost/admin/
+
+```

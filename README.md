@@ -43,11 +43,12 @@
 
 ### Департаменты
 
-- [ ] Тесты модели и api роутов
-- [ ] CMS Создание и редактирование
-- [ ] GET /api/v1/departments/1 — получить информацию об отделе
-- [ ] GET /api/v1/departments — Получить все отделы
-- [ ] GET /api/v1/departments/1/employees — Получить сотрудников отдела
+- [x] Тесты модели и api роутов
+- [x] CMS Создание и редактирование
+- [x] GET /api/v1/departments/1 — получить информацию об отделе
+- [x] GET /api/v1/departments — Получить все отделы
+- [x] GET /api/v1/departments/1/employees — Получить сотрудников отдела
+- [ ] hierarchy api
 
 ### Фронтенд
 

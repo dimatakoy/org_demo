@@ -6,6 +6,34 @@
 - Для избежания n+1 используется select_related + аннотации для упрощения кода
 - Для API используем django-ninja.
 
+**Структура проекта:**
+
+```
+.
+├── db.sqlite3
+├── manage.py
+├── org
+│   ├── __init__.py
+│   ├── conf
+│   │   ├── __init__.py
+│   │   ├── asgi.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   └── departments
+│       ├── __init__.py
+│       ├── admin.py
+│       ├── api_test.py
+│       ├── api.py
+│       ├── apps.py
+│       ├── migrations
+│       ├── models_test.py
+│       └── models.py
+├── pyproject.toml
+├── README.md
+└── uv.lock
+```
+
 ### Сотрудники
 
 - [x] CMS Создание и редактирование сотрудника и должность

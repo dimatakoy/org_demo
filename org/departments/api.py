@@ -61,15 +61,7 @@ def get_employee(request, id: int):
             .get(pk=id)
         )
 
-        return 200, EmployeeSchema(
-            id=employee.pk,
-            first_name=employee.first_name,
-            last_name=employee.last_name,
-            middle_name=employee.middle_name,
-            amount=employee.amount,
-            hire_date=employee.hire_date,
-            position_title=employee.position_title,
-        )
+        return 200, employee
     except Employee.DoesNotExist:
         return 410, EmployeeNotFoundSchema(ok=False, error_code="employee_not_found")
 
@@ -97,13 +89,10 @@ def list_departments(request):
         410: DepartmentFoundSchema,
     },
 )
-def list_departments(request, id: int):
+def get_department(request, id: int):
     try:
         department = Department.objects.get(pk=id)
-        return 200, DepartmentSchema(
-            id=department.pk,
-            title=department.title,
-        )
+        return 200, department
     except Department.DoesNotExist:
         return 410, DepartmentFoundSchema(ok=False, error_code="department_not_found")
 

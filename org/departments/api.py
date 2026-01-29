@@ -70,7 +70,7 @@ def get_employee(request, id: int):
 
 @employees_router.get("/", response=List[EmployeeSchema])
 @paginate(LimitOffsetPagination)
-def list_users(request):
+def list_employees(request):
     return (
         Employee.objects.select_related("position")
         .annotate(position_title=F("position__title"))

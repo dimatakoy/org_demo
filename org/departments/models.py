@@ -2,6 +2,8 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 
+from treenode.models import TreeNodeModel
+
 
 class BaseModel(models.Model):
     class Meta:
@@ -18,7 +20,9 @@ class Position(BaseModel):
         return f"{self.pk}#{self.title}"
 
 
-class Department(BaseModel):
+class Department(BaseModel, TreeNodeModel):
+    treenode_display_field = "title"
+
     title = models.CharField(
         verbose_name="Департамент",
         max_length=100,

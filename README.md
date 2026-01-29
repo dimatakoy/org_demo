@@ -48,7 +48,7 @@
 - [x] GET /api/v1/departments/1 — получить информацию об отделе
 - [x] GET /api/v1/departments — Получить все отделы
 - [x] GET /api/v1/departments/1/employees — Получить сотрудников отдела
-- [ ] hierarchy api
+- [x] hierarchy api
 
 ### Фронтенд
 

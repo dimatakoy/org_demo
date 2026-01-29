@@ -33,6 +33,12 @@ class EmployeeNotFoundSchema(Schema):
 class DepartmentSchema(Schema):
     id: int
     title: str
+    parent_id: int | None
+    children: List["DepartmentSchema"] = []
+
+    @staticmethod
+    def resolve_parent_id(obj: Department):
+        return obj.get_parent_pk
 
 
 class DepartmentFoundSchema(Schema):

@@ -1,4 +1,8 @@
 from django.contrib import admin
+
+from treenode.admin import TreeNodeModelAdmin
+from treenode.forms import TreeNodeForm
+
 from .models import Employee, Position, Department
 
 
@@ -13,5 +17,6 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 
 @admin.register(Department)
-class DepartmentAdmin(admin.ModelAdmin):
-    pass
+class DepartmentAdmin(TreeNodeModelAdmin):
+    treenode_display_mode = TreeNodeModelAdmin.TREENODE_DISPLAY_MODE_ACCORDION
+    form = TreeNodeForm

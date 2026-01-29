@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "org.departments",
 ]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

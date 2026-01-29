@@ -27,7 +27,8 @@ class Department(BaseModel):
     )
 
     def __str__(self):
-        return f"{self.pk}#{self.title}"
+        breadcrumbs = [item.title for item in self.breadcrumbs]
+        return " / ".join(breadcrumbs)
 
 
 class Employee(BaseModel):

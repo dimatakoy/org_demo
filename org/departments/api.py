@@ -100,3 +100,13 @@ def list_departments(request, id: int):
         )
     except Department.DoesNotExist:
         return 410, DepartmentFoundSchema(ok=False, error_code="department_not_found")
+
+
+@departments_router.get("/{department_id}/employees", response=List[EmployeeSchema])
+@paginate(LimitOffsetPagination)
+def list_departments_employees(request, department_id: int):
+    return (
+        Employee.objects.select_related("position")
+        .annotate(position_title=F("position__title"))
+        .filter(department_id=department_id)
+    )

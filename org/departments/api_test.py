@@ -2,7 +2,9 @@ from datetime import datetime
 
 import pytest
 
+from django.db import transaction
 from ninja.testing import TestClient
+
 from .api import employees_router, departments_router
 from .models import Employee, Department
 
@@ -21,6 +23,19 @@ def demo_employee():
         amount="200",
         hire_date=datetime.now(),
     )
+
+
+@pytest.fixture
+def department_with_employee(demo_employee):
+    with transaction.atomic():
+        department = Department.objects.create(
+            title="Тестовый департамент",
+        )
+
+        demo_employee.department = department
+        demo_employee.save()
+
+        return department
 
 
 @pytest.fixture
@@ -84,4 +99,14 @@ def test_list_departments():
     assert response.status_code == 200
 
     assert response.data["count"] == 0
+    assert type(response.data["items"]) is list
+
+
+def test_list_department_employee(department_with_employee):
+    department_id = department_with_employee.pk
+
+    response = departments_client.get(f"/{department_id}/employees")
+
+    assert response.status_code == 200
+    assert response.data["count"] == 1
     assert type(response.data["items"]) is list

@@ -81,3 +81,9 @@ class Employee(BaseModel):
         null=True,
         blank=True,
     )
+
+    def __str__(self):
+        if self.middle_name is None:
+            return f"#{self.pk} / {self.last_name} {self.first_name}"
+
+        return f"#{self.pk} / {self.last_name} {self.first_name} {self.middle_name}"

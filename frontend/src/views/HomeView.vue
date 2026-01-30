@@ -1,97 +1,111 @@
 <script lang="ts" setup>
 import { getDepartmentEmployees, getDepartments } from '@/shared/api/client'
 import type { components } from '@/shared/api/schema'
-import { useQuery } from '@tanstack/vue-query'
-import { Tree } from 'primevue'
-import { type TreeNode } from 'primevue/treenode'
-import { computed, ref, shallowRef, watchEffect } from 'vue'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, ref, useTemplateRef, watchEffect } from 'vue'
+
+import { BaseTree } from '@he-tree/vue'
+import '@he-tree/vue/style/default.css'
+import '@he-tree/vue/style/material-design.css'
 
 const departmentsQuery = useQuery({
   queryKey: ['departments'],
   queryFn: getDepartments,
 })
 
-const activeDepartment = ref<string | null>(null)
-const activeNode = shallowRef<TreeNode | null>(null)
+const client = useQueryClient()
+
+const activeDepartment = ref(null)
+const activeDepartmentId = computed(() => activeDepartment.value?.data.id)
 
 const departmentEmployeesQuery = useQuery({
-  queryKey: ['department-employee', activeDepartment],
-  async queryFn() {
-    return getDepartmentEmployees({
-      departmentId: activeDepartment.value,
-      limit: 100_000,
+  queryKey: ['department-employees', activeDepartmentId],
+  queryFn: async () => {
+    const data = await getDepartmentEmployees({
+      departmentId: activeDepartmentId.value,
+      limit: 10_000,
     })
+
+    return data
   },
-  staleTime: Number.POSITIVE_INFINITY,
   enabled: () => activeDepartment.value !== null,
 })
 
 type Department = components['schemas']['DepartmentSchema']
-const mapDepartmentToNode = (dept: Department): TreeNode => {
+function mapItemToNode(item: Department) {
   return {
-    key: String(dept.id),
-    label: dept.title,
-    data: {
-      type: 'department',
-      department: dept,
-    },
-    icon: 'pi pi-building',
-    children: dept.children.map(mapDepartmentToNode),
-    loading: true,
+    id: item.id,
+    text: item.title,
+    children: item.children.map(mapItemToNode),
+    type: 'department',
   }
 }
 
-type Employee = components['schemas']['EmployeeSchema']
-function mapEmployeeToNode(employee: Employee) {
-  return {
-    key: `emp-${employee.id}`,
-    label: `${employee.first_name} ${employee.last_name} ${employee.middle_name ?? ''}`,
-    icon: 'pi pi-user',
-    data: { type: 'employee', employee },
-    leaf: true,
-  }
-}
-
-const departments = computed(() => {
-  if (departmentsQuery.isFetching.value) {
-    return []
+const treeData = computed(() => {
+  if (departmentsQuery.data.value) {
+    return departmentsQuery.data.value.items.map(mapItemToNode)
   }
 
-  const items: TreeNode[] = departmentsQuery.data.value.items.map((department) => {
-    return mapDepartmentToNode(department)
-  })
-
-  return items
+  return []
 })
 
-async function onNodeExpand(node: TreeNode) {
-  activeDepartment.value = node.key
-  activeNode.value = node
-  activeNode.value.loading = true
+function onClickNode(node: any) {
+  activeDepartment.value = node
 }
 
+const treeRef = useTemplateRef('tree')
+
 watchEffect(() => {
-  if (departmentEmployeesQuery.isFetching.value) return
-  if (activeNode.value === null) return
+  if (!activeDepartment.value) {
+    return
+  }
 
   if (departmentEmployeesQuery.data.value) {
-    activeNode.value.children = [
-      ...activeNode.value.children?.filter((child) => child.data.type === 'department'),
-      ...departmentEmployeesQuery.data.value.items.map((e) => mapEmployeeToNode(e)),
-    ]
+    if (activeDepartment.value.employeesLoaded) return
 
-    activeNode.value.loading = false
+    treeRef.value?.addMulti(
+      departmentEmployeesQuery.data.value.items.map((e) => {
+        return {
+          id: e.id,
+          text: `${e.last_name} ${e.first_name} ${e.middle_name ?? ''}`,
+          children: [],
+          type: 'employee',
+        }
+      }),
+      activeDepartment.value,
+    )
+
+    activeDepartment.value.employeesLoaded = true
   }
 })
 </script>
 
 <template>
-  <Tree
-    class="tree"
-    :value="departments"
-    @node-expand="onNodeExpand"
-    selectionMode="multiple"
-  ></Tree>
+  <BaseTree
+    v-model="treeData"
+    ref="tree"
+    :virtualization="true"
+    :default-open="false"
+    @click:node="onClickNode"
+  >
+    <template #default="{ node, stat }">
+      <button @click="stat.open = !stat.open" :disabled="node.children.length === 0">
+        {{ stat.open ? '-' : '+' }}
+      </button>
+
+      {{ node.type === 'department' ? '🏢' : '🙋‍♂️' }}
+
+      {{ node.text }}
+
+      <strong
+        >{{
+          departmentEmployeesQuery.isFetching.value && activeDepartment.data.id === node.id
+            ? 'Loading...'
+            : ''
+        }}
+      </strong>
+    </template>
+  </BaseTree>
 </template>
 
 <style scoped>

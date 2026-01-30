@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "ninja",  # adds `export_openapi_schema` command
     "treenode",
     # own apps
     "org.departments",

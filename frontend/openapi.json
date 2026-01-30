@@ -1,0 +1,333 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "NinjaAPI", "version": "1.0.0", "description": "" },
+  "paths": {
+    "/api/v1/employees/{id}": {
+      "get": {
+        "operationId": "org_departments_api_get_employee",
+        "summary": "Get Employee",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "title": "Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/EmployeeSchema" }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeNotFoundSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/employees/": {
+      "get": {
+        "operationId": "org_departments_api_list_employees",
+        "summary": "List Employees",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PagedEmployeeSchema" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/departments/": {
+      "get": {
+        "operationId": "org_departments_api_list_departments",
+        "summary": "List Departments",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedDepartmentSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/departments/{id}": {
+      "get": {
+        "operationId": "org_departments_api_get_department",
+        "summary": "Get Department",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "title": "Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DepartmentSchema" }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentFoundSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/departments/{department_id}/employees": {
+      "get": {
+        "operationId": "org_departments_api_list_departments_employees",
+        "summary": "List Departments Employees",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "department_id",
+            "schema": { "title": "Department Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PagedEmployeeSchema" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmployeeSchema": {
+        "properties": {
+          "id": { "title": "Id", "type": "integer" },
+          "first_name": { "title": "First Name", "type": "string" },
+          "last_name": { "title": "Last Name", "type": "string" },
+          "middle_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Middle Name"
+          },
+          "amount": { "title": "Amount", "type": "integer" },
+          "hire_date": {
+            "format": "date-time",
+            "title": "Hire Date",
+            "type": "string"
+          },
+          "position_title": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Position Title"
+          },
+          "department_id": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Department Id"
+          }
+        },
+        "required": [
+          "id",
+          "first_name",
+          "last_name",
+          "middle_name",
+          "amount",
+          "hire_date",
+          "position_title",
+          "department_id"
+        ],
+        "title": "EmployeeSchema",
+        "type": "object"
+      },
+      "EmployeeNotFoundSchema": {
+        "properties": {
+          "ok": { "const": false, "title": "Ok", "type": "boolean" },
+          "error_code": {
+            "const": "employee_not_found",
+            "title": "Error Code",
+            "type": "string"
+          }
+        },
+        "required": ["ok", "error_code"],
+        "title": "EmployeeNotFoundSchema",
+        "type": "object"
+      },
+      "Input": {
+        "properties": {
+          "limit": {
+            "default": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "title": "Input",
+        "type": "object"
+      },
+      "PagedEmployeeSchema": {
+        "properties": {
+          "items": {
+            "items": { "$ref": "#/components/schemas/EmployeeSchema" },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": { "title": "Count", "type": "integer" }
+        },
+        "required": ["items", "count"],
+        "title": "PagedEmployeeSchema",
+        "type": "object"
+      },
+      "DepartmentSchema": {
+        "properties": {
+          "id": { "title": "Id", "type": "integer" },
+          "title": { "title": "Title", "type": "string" },
+          "parent_id": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Parent Id"
+          },
+          "children": {
+            "default": [],
+            "items": { "$ref": "#/components/schemas/DepartmentSchema" },
+            "title": "Children",
+            "type": "array"
+          }
+        },
+        "required": ["id", "title", "parent_id"],
+        "title": "DepartmentSchema",
+        "type": "object"
+      },
+      "PagedDepartmentSchema": {
+        "properties": {
+          "items": {
+            "items": { "$ref": "#/components/schemas/DepartmentSchema" },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": { "title": "Count", "type": "integer" }
+        },
+        "required": ["items", "count"],
+        "title": "PagedDepartmentSchema",
+        "type": "object"
+      },
+      "DepartmentFoundSchema": {
+        "properties": {
+          "ok": { "const": false, "title": "Ok", "type": "boolean" },
+          "error_code": {
+            "const": "department_not_found",
+            "title": "Error Code",
+            "type": "string"
+          }
+        },
+        "required": ["ok", "error_code"],
+        "title": "DepartmentFoundSchema",
+        "type": "object"
+      }
+    }
+  },
+  "servers": []
+}

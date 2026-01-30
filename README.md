@@ -86,4 +86,11 @@ docker compose run backend ./manage.py createsuperuser
 # if our config the same
 open https://localhost/admin/
 
+
+```
+
+## TODO Как поднять фронтенд
+
+```
+./manage.py export_openapi_schema --api org.conf.urls.api > openapi.json
 ```

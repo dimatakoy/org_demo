@@ -63,6 +63,13 @@
 	}
 
 	handle @backend {
+		# test only
+		header {
+			Access-Control-Allow-Origin "*"
+			Access-Control-Allow-Methods "*"
+			Access-Control-Allow-Headers "*"
+		}
+
 		reverse_proxy backend:8000
 	}
 
